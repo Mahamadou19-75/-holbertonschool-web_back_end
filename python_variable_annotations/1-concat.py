@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Module that provides a type-annotated concat function."""
+"""Module that contains a function to concatenate two strings."""
 
 
 def concat(str1: str, str2: str) -> str:
-    """Return the concatenation of two strings."""
-    return "{}{}".format(str1, str2)
+    """Returns the concatenation of two strings."""
+    return str1 + str2
