@@ -1,47 +1,43 @@
+// 3-read_file_async.js
 const fs = require('fs');
 
-/**
- * Compte les étudiants dans un fichier CSV de manière asynchrone.
- * @param {string} path - Le chemin vers le fichier CSV.
- * @returns {Promise}
- */
 function countStudents(path) {
   return new Promise((resolve, reject) => {
-    // Lecture asynchrone du fichier
-    fs.readFile(path, 'utf8', (err, data) => {
+    fs.readFile(path, 'utf-8', (err, data) => {
       if (err) {
-        // Si une erreur survient (ex: fichier inexistant), on rejette la promesse
         reject(new Error('Cannot load the database'));
         return;
       }
 
-      // Traitement des données (logique identique à la version synchrone)
-      const lines = data.split('\n').filter((line) => line.trim() !== '');
-      const studentLines = lines.slice(1);
-
-      console.log(`Number of students: ${studentLines.length}`);
-
       const fields = {};
+      const students = data.split('\n').filter((student) => student.trim() !== '');
+      if (students.length === 0) {
+        reject(new Error('Cannot load the database'));
+        return;
+      }
 
-      for (const line of studentLines) {
-        const studentData = line.split(',');
-        if (studentData.length < 4) continue; // Sécurité pour les lignes malformées
+      students.shift();
 
-        const firstName = studentData[0];
-        const field = studentData[3];
+      let response = `Number of students: ${students.length}`;
+      console.log(response);
+      response += '\n';
 
+      for (const student of students) {
+        const cols = student.split(',');
+        const field = cols[3];
         if (!fields[field]) {
           fields[field] = [];
         }
-        fields[field].push(firstName);
+        fields[field].push(cols[0]);
       }
 
-      for (const [field, names] of Object.entries(fields)) {
-        console.log(`Number of students in ${field}: ${names.length}. List: ${names.join(', ')}`);
+      for (const i of Object.keys(fields)) {
+        const responseField = `Number of students in ${i}: ${fields[i].length}. List: ${fields[i].join(', ')}`;
+        response += `${responseField}\n`;
+        console.log(responseField);
       }
 
-      // On résout la promesse une fois le traitement terminé
-      resolve();
+      resolve(response);
     });
   });
 }
